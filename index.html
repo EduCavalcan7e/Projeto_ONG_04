@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esperança Viva | ONF - Juntos Transformamos Vidas (SPA - Acessível)</title>
+    <!-- Carrega Tailwind CSS para o Design System e Classes Responsivas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Ícones Lucide -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Configuração e Variáveis do Design System (Overrides do Tailwind) */
+        :root {
+            /* Paleta de Cores Customizadas */
+            --color-primary-600: #10B981; /* Verde Esmeralda Principal */
+            --color-secondary-600: #3B82F6; /* Azul Royal Secundário */
+            --color-neutral-900: #1F2937; /* Cinza Escuro (Textos) */
+            --color-neutral-100: #F3F4F6; /* Cinza Claro (Fundos) */
+            --color-success: #059669; /* Sucesso (badges/toasts) */
+            --color-warning: #F59E0B; /* Aviso */
+            --color-error: #EF4444; /* Erro */
+        }
+
+        /* Configuração de Tipografia (Sistema Hierárquico de Fontes) */
+        .text-h1 { font-size: 3rem; line-height: 1.1; font-weight: 800; } /* 48px */
+        .text-h2 { font-size: 2.25rem; line-height: 1.2; font-weight: 700; } /* 36px */
+        .text-h3 { font-size: 1.5rem; line-height: 1.3; font-weight: 700; } /* 24px */
+        .text-body-lg { font-size: 1.125rem; line-height: 1.6; font-weight: 400; } /* 18px */
+        .text-body-base { font-size: 1rem; line-height: 1.5; font-weight: 400; } /* 16px */
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--color-neutral-100); color: var(--color-neutral-900); transition: background-color 0.3s, color 0.3s; }
+
+        /* Estilo do Menu Dropdown (Desktop) */
+        .dropdown:hover .dropdown-menu { display: block; }
+
+        /* Foco Visível para Teclado (WCAG 2.1 AA) */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 3px solid var(--color-secondary-600);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+
+        /* Estilização de Formulários (Contraste mínimo já garantido) */
+        input:not([type="checkbox"]):not([type="radio"]), select {
+            border-radius: 0.5rem;
+            border: 1px solid #D1D5DB;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            background-color: white;
+            transition: all 0.2s;
+        }
+        /* [Estilos de Foco e Validação mantidos, mas com foco aprimorado acima] */
+
+        /* Componente de Feedback: Toast/Alerts */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--color-neutral-900);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .toast.show { visibility: visible; opacity: 1; }
+
+        /* ======================================= */
+        /* ESTILOS DE ACESSIBILIDADE WCAG */
+        /* ======================================= */
+
+        /* 1. Modo Escuro Acessível */
+        .theme-dark {
+            --color-neutral-900: #F3F4F6; /* Texto claro */
+            --color-neutral-100: #1F2937; /* Fundo escuro principal */
+            background-color: var(--color-neutral-100) !important;
+            color: var(--color-neutral-900) !important;
+        }
+        .theme-dark header, .theme-dark footer, .theme-dark .bg-white {
+             background-color: #111827 !important; color: white !important;
+        }
+        .theme-dark .bg-neutral-100 { background-color: #374151 !important; }
+        .theme-dark input, .theme-dark select, .theme-dark .bg-white { border-color: #4B5563; }
+        .theme-dark .text-neutral-900 { color: #F3F4F6 !important; }
+        .theme-dark .text-neutral-700 { color: #D1D5DB !important; }
+        .theme-dark .text-neutral-600 { color: #9CA3AF !important; }
+
+        /* 2. Alto Contraste Acessível */
+        .theme-high-contrast {
+            --color-primary-600: #FFFF00; /* Amarelo Vibrante */
+            --color-secondary-600: #00FFFF; /* Ciano Vibrante */
+            --color-neutral-900: #FFFFFF; /* Texto Branco */
+            --color-neutral-100: #000000; /* Fundo Preto */
+            background-color: var(--color-neutral-100) !important;
+            color: var(--color-neutral-900) !important;
+        }
+        .theme-high-contrast header, .theme-high-contrast footer,
+        .theme-high-contrast .bg-white, .theme-high-contrast .bg-neutral-100,
+        .theme-high-contrast input, .theme-high-contrast select, .theme-high-contrast fieldset {
+            background-color: var(--color-neutral-100) !important;
+            color: var(--color-neutral-900) !important;
+            border-color: var(--color-neutral-900) !important;
+            border-width: 1px !important;
+        }
+        .theme-high-contrast .btn-primary { background-color: var(--color-primary-600) !important; color: #000000 !important; font-weight: 700 !important; }
+        .theme-high-contrast .btn-secondary { background-color: #000000 !important; color: var(--color-primary-600) !important; font-weight: 700 !important; border-color: var(--color-primary-600) !important; }
+        .theme-high-contrast input, .theme-high-contrast select { border-width: 2px; border-color: #FFFFFF; }
+        .theme-high-contrast a:focus-visible, .theme-high-contrast button:focus-visible,
+        .theme-high-contrast input:focus-visible, .theme-high-contrast select:focus-visible {
+            outline: 4px solid var(--color-secondary-600) !important; /* Foco forte WCAG */
+            box-shadow: none !important;
+        }
+    </style>
+    <script>
+        // Configuração Customizada do Tailwind (Mantida)
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': { 600: 'var(--color-primary-600)', 700: '#047857', },
+                        'secondary': { 600: 'var(--color-secondary-600)', },
+                        'neutral': { 900: 'var(--color-neutral-900)', 100: 'var(--color-neutral-100)', },
+                        'success': 'var(--color-success)',
+                        'error': 'var(--color-error)',
+                    },
+                    spacing: { '1': '8px', '2': '16px', '3': '24px', '4': '32px', '5': '48px', '6': '64px', },
+                    screens: { 'xs': '400px', 'sm': '640px', 'md': '768px', 'lg': '1024px', 'xl': '1280px', '2xl': '1536px', },
+                    gridTemplateColumns: { '12': 'repeat(12, minmax(0, 1fr))', }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="antialiased min-h-screen">
+    <!-- Componente de Navegação Principal -->
+    <header class="sticky top-0 z-50 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Logo e Título -->
+            <a href="#home" class="flex items-center space-x-2 spa-link" data-page="home">
+                <div class="p-2 bg-primary-600 rounded-full">
+                    <i data-lucide="heart-handshake" class="w-6 h-6 text-white"></i>
+                </div>
+                <h1 class="text-h3 text-primary-600 font-extrabold">Esperança Viva</h1>
+            </a>
+
+            <!-- Controles de Acessibilidade -->
+            <div class="hidden md:flex items-center space-x-2 mr-4">
+                <button onclick="toggleTheme('default')" title="Tema Padrão" class="p-2 rounded-full hover:bg-neutral-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-600" aria-label="Aplicar tema padrão">
+                    <i data-lucide="sun" class="w-5 h-5"></i>
+                </button>
+                <button onclick="toggleTheme('dark')" title="Modo Escuro" class="p-2 rounded-full hover:bg-neutral-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-600" aria-label="Aplicar modo escuro">
+                    <i data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+                <button onclick="toggleTheme('high-contrast')" title="Alto Contraste" class="p-2 rounded-full hover:bg-neutral-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-600" aria-label="Aplicar modo de alto contraste">
+                    <i data-lucide="circle-dot" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Navegação Desktop -->
+            <nav class="hidden lg:flex space-x-4 items-center">
+                <a href="#home" class="text-neutral-900 hover:text-primary-600 p-2 rounded-lg transition duration-150 spa-link" data-page="home">Início</a>
+                <div class="relative dropdown">
+                    <button class="flex items-center text-neutral-900 hover:text-primary-600 p-2 rounded-lg transition duration-150" aria-expanded="false" aria-controls="submenu-causa" id="dropdown-button">
+                        Nossa Causa <i data-lucide="chevron-down" class="w-4 h-4 ml-1"></i>
+                    </button>
+                    <!-- Submenu Dropdown com role="menu" para acessibilidade -->
+                    <div id="submenu-causa" class="dropdown-menu hidden absolute z-50 mt-1 w-48 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5" role="menu">
+                        <a href="#projetos" class="block px-4 py-2 text-sm text-neutral-900 hover:bg-neutral-100 rounded-t-lg spa-link" data-page="projetos" role="menuitem">Nossos Projetos</a>
+                        <a href="#projetos" class="block px-4 py-2 text-sm text-neutral-900 hover:bg-neutral-100 spa-link" data-page="projetos" role="menuitem">Como Doar</a>
+                        <a href="#projetos" class="block px-4 py-2 text-sm text-neutral-900 hover:bg-neutral-100 rounded-b-lg spa-link" data-page="projetos" role="menuitem">Voluntariado</a>
+                    </div>
+                </div>
+                <a href="#cadastro" class="text-neutral-900 hover:text-primary-600 p-2 rounded-lg transition duration-150 spa-link" data-page="cadastro">Seja um Apoiador</a>
+                <!-- Botão de Ação com Estados Visuais -->
+                <a href="#projetos" class="btn-primary spa-link" data-page="projetos">
+                    Doe Agora
+                </a>
+            </nav>
+
+            <!-- Botão Menu Hambúrguer (Mobile) - ARIA Acessível -->
+            <button id="menu-button" class="lg:hidden p-2 text-neutral-900 hover:text-primary-600 rounded-lg" aria-controls="mobile-menu" aria-expanded="false" aria-label="Menu principal">
+                <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+            </button>
+        </div>
+
+        <!-- Navegação Mobile (Menu Hambúrguer) - ARIA Acessível -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white px-4 pb-4">
+            <nav class="flex flex-col space-y-2" aria-label="Navegação mobile">
+                <a href="#home" class="text-neutral-900 hover:bg-neutral-100 p-3 rounded-lg spa-link" data-page="home">Início</a>
+                <a href="#projetos" class="text-neutral-900 hover:bg-neutral-100 p-3 rounded-lg spa-link" data-page="projetos">Nossos Projetos</a>
+                <a href="#projetos" class="text-neutral-900 hover:bg-neutral-100 p-3 rounded-lg spa-link" data-page="projetos">Voluntariado</a>
+                <a href="#projetos" class="text-neutral-900 hover:bg-neutral-100 p-3 rounded-lg spa-link" data-page="projetos">Como Doar</a>
+                <a href="#cadastro" class="text-neutral-900 hover:bg-neutral-100 p-3 rounded-lg spa-link" data-page="cadastro">Seja um Apoiador</a>
+                <a href="#projetos" class="btn-primary text-center mt-2 spa-link" data-page="projetos">Doe Agora</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+        <!-- Estilização dos Botões (CSS/Tailwind Custom) -->
+        <style>
+            /* Botões com estados visuais (Mantidos) */
+            .btn-primary {
+                @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-body-base font-semibold rounded-lg shadow-md transition duration-200 ease-in-out;
+                @apply bg-primary-600 text-white;
+            }
+            .btn-primary:hover { @apply bg-primary-700 shadow-lg transform scale-[1.02]; }
+            .btn-primary:focus { @apply ring-4 ring-primary-600 ring-opacity-50 outline-none; }
+            .btn-primary:active { @apply bg-primary-700 shadow-sm transform scale-100; }
+            .btn-primary:disabled { @apply bg-neutral-300 cursor-not-allowed shadow-none; }
+
+            .btn-secondary {
+                @apply inline-flex items-center justify-center px-4 py-2 border border-primary-600 text-body-base font-semibold rounded-lg transition duration-200 ease-in-out;
+                @apply bg-white text-primary-600;
+            }
+            .btn-secondary:hover { @apply bg-primary-600 text-white shadow-lg; }
+            .btn-secondary:focus { @apply ring-4 ring-primary-600 ring-opacity-50 outline-none; }
+            .btn-secondary:active { @apply bg-primary-700 shadow-sm; }
+            .btn-secondary:disabled { @apply text-neutral-500 border-neutral-300 bg-neutral-100 cursor-not-allowed; }
+        </style>
+
+        <!-- PÁGINA INICIAL (index.html simulado) -->
+        <section id="home" class="pt-16 pb-24 bg-white page-section" data-page="home" aria-labelledby="home-heading">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12">
+                    <div class="lg:col-span-7 xl:col-span-8 space-y-6">
+                        <header>
+                            <h2 id="home-heading" class="text-h1 text-neutral-900">
+                                <span class="text-secondary-600">Transformando Vidas</span> com Ações Significativas
+                            </h2>
+                            <p class="text-body-lg text-neutral-600 mt-4">
+                                A Esperança Viva é uma ONF dedicada a construir um futuro mais justo e sustentável através de educação, saúde e apoio comunitário.
+                            </p>
+                        </header>
+                        <!-- Conteúdo da home -->
+                        <div class="flex flex-col md:flex-row gap-6 mt-8">
+                            <div class="flex-1 p-6 bg-neutral-100 rounded-xl shadow-lg border border-gray-200">
+                                <h3 class="text-h3 text-primary-600 mb-3">Nossa Missão</h3>
+                                <p class="text-body-base text-neutral-800">Erradicar a pobreza e promover a dignidade humana, fornecendo ferramentas e oportunidades para que comunidades carentes prosperem de forma autônoma.</p>
+                            </div>
+                            <div class="flex-1 p-6 bg-neutral-100 rounded-xl shadow-lg border border-gray-200">
+                                <h3 class="text-h3 text-secondary-600 mb-3">Nossos Valores</h3>
+                                <ul class="text-body-base text-neutral-800 space-y-1">
+                                    <li><i data-lucide="check-circle" class="w-4 h-4 text-primary-600 inline mr-2" aria-hidden="true"></i> Transparência</li>
+                                    <li><i data-lucide="check-circle" class="w-4 h-4 text-primary-600 inline mr-2" aria-hidden="true"></i> Empatia</li>
+                                    <li><i data-lucide="check-circle" class="w-4 h-4 text-primary-600 inline mr-2" aria-hidden="true"></i> Sustentabilidade</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <figure class="mt-8 rounded-xl overflow-hidden shadow-2xl">
+                            <img src="https://placehold.co/1200x500/10B981/ffffff?text=Crianças+em+Atividade+Educacional" alt="Crianças sorrindo em uma atividade educativa, representando o impacto da ONF." class="w-full h-auto object-cover">
+                            <figcaption class="sr-only">Crianças felizes participando de um projeto de educação da ONF.</figcaption>
+                        </figure>
+                    </div>
+
+                    <aside class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 h-fit" role="complementary" aria-label="Informações de Contato">
+                        <div class="p-6 bg-secondary-600 text-white rounded-xl shadow-2xl space-y-4">
+                            <h3 class="text-h3 border-b border-white border-opacity-30 pb-2 mb-4">Entre em Contato</h3>
+                            <div class="space-y-3">
+                                <p class="flex items-center space-x-2">
+                                    <i data-lucide="mail" class="w-5 h-5" aria-hidden="true"></i>
+                                    <span class="font-semibold">Email:</span> contato@esperancaviva.org
+                                </p>
+                                <p class="flex items-center space-x-2">
+                                    <i data-lucide="phone" class="w-5 h-5" aria-hidden="true"></i>
+                                    <span class="font-semibold">Telefone:</span> (11) 98765-4321
+                                </p>
+                                <p class="flex items-center space-x-2">
+                                    <i data-lucide="map-pin" class="w-5 h-5" aria-hidden="true"></i>
+                                    <span class="font-semibold">Endereço:</span> Av. Solidariedade, 123 - Centro, São Paulo
+                                </p>
+                            </div>
+                            <a href="#cadastro" class="btn-secondary w-full text-center mt-4 !bg-white !text-secondary-600 hover:!bg-gray-100 spa-link" data-page="cadastro">
+                                <i data-lucide="user-plus" class="w-5 h-5 mr-2" aria-hidden="true"></i> Seja um Voluntário
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA PROJETOS SOCIAIS (projetos.html simulado) -->
+        <section id="projetos" class="py-24 bg-neutral-100 page-section hidden" data-page="projetos" aria-labelledby="projetos-heading">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <header class="text-center mb-12">
+                    <h2 id="projetos-heading" class="text-h2 text-neutral-900">Nossos Projetos de Impacto</h2>
+                    <p class="text-body-lg text-neutral-600 mt-2">Conheça as iniciativas que transformam a realidade de milhares de pessoas.</p>
+                </header>
+
+                <!-- Container dinâmico injetado por template (MÓDULO 2) -->
+                <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
+                    <!-- Cards de projetos serão injetados aqui -->
+                </div>
+
+                <!-- Seção de Voluntariado e Doação -->
+                <div class="mt-16 pt-12 border-t border-gray-300">
+                    <h2 class="text-h2 text-neutral-900 text-center mb-8">Participe e Faça a Diferença</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="p-6 bg-white rounded-xl shadow-xl space-y-4">
+                            <h3 class="text-h3 text-secondary-600 flex items-center"><i data-lucide="user-plus" class="w-6 h-6 mr-2" aria-hidden="true"></i> Voluntariado</h3>
+                            <p class="text-body-base text-neutral-700">Dedique seu tempo e talento. Temos vagas em educação, administração e eventos. Sua contribuição é inestimável.</p>
+                            <ul class="list-disc list-inside text-body-base text-neutral-700 ml-4">
+                                <li>Carga horária flexível.</li>
+                                <li>Certificado de participação.</li>
+                            </ul>
+                            <a href="#cadastro" class="btn-primary mt-4 spa-link" data-page="cadastro">Quero ser Voluntário</a>
+                        </div>
+                        <div class="p-6 bg-white rounded-xl shadow-xl space-y-4">
+                            <h3 class="text-h3 text-primary-600 flex items-center"><i data-lucide="dollar-sign" class="w-6 h-6 mr-2" aria-hidden="true"></i> Como Doar</h3>
+                            <p class="text-body-base text-neutral-700">Toda doação, de qualquer valor, garante a continuidade dos nossos projetos. Aceitamos PIX, Cartão e Boleto.</p>
+                            <ul class="list-disc list-inside text-body-base text-neutral-700 ml-4">
+                                <li>Doação única ou mensal.</li>
+                                <li>Prestação de contas transparente.</li>
+                            </ul>
+                            <a href="#" class="btn-primary mt-4">Doar Agora</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PÁGINA CADASTRO (cadastro.html simulado) -->
+        <section id="cadastro" class="py-24 bg-white page-section hidden" data-page="cadastro" aria-labelledby="cadastro-heading">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <header class="text-center mb-12">
+                    <h2 id="cadastro-heading" class="text-h2 text-neutral-900">Junte-se à Nossa Causa</h2>
+                    <p class="text-body-lg text-neutral-600 mt-2">Preencha o formulário e faça parte da nossa rede de apoiadores e voluntários.</p>
+                </header>
+
+                <!-- Formulário Complexo e Estilizado -->
+                <form id="cadastroForm" class="bg-neutral-100 p-8 md:p-12 rounded-xl shadow-2xl space-y-6">
+                    <!-- Agrupamento Lógico 1: Dados Pessoais -->
+                    <fieldset class="border border-gray-300 p-6 rounded-lg space-y-4">
+                        <legend class="text-h3 text-primary-600 px-2">Dados Pessoais</legend>
+
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                            <div class="col-span-12">
+                                <label for="nome" class="block text-sm font-medium text-neutral-700 mb-1">Nome Completo <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required class="w-full" aria-required="true">
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label for="email" class="block text-sm font-medium text-neutral-700 mb-1">E-mail <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required class="w-full" aria-required="true">
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label for="cpf" class="block text-sm font-medium text-neutral-700 mb-1">CPF <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Formato: 000.000.000-00" aria-required="true" aria-describedby="cpf-error-message">
+                                <p id="cpf-error-message" class="text-error text-xs mt-1 hidden" role="alert" aria-live="assertive">CPF inválido. Verifique os números.</p>
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label for="telefone" class="block text-sm font-medium text-neutral-700 mb-1">Telefone <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required pattern="\(\d{2}\)\s\d{4,5}-\d{4}" title="Formato: (00) 00000-0000" aria-required="true">
+                            </div>
+                            <div class="col-span-12 md:col-span-6">
+                                <label for="dataNasc" class="block text-sm font-medium text-neutral-700 mb-1">Data de Nascimento <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="date" id="dataNasc" name="dataNasc" required max="2007-12-31" title="Você deve ser maior de 18 anos para o cadastro" aria-required="true">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Agrupamento Lógico 2: Endereço -->
+                    <fieldset class="border border-gray-300 p-6 rounded-lg space-y-4">
+                        <legend class="text-h3 text-primary-600 px-2">Endereço</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                            <div class="col-span-12 md:col-span-5">
+                                <label for="cep" class="block text-sm font-medium text-neutral-700 mb-1">CEP <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="text" id="cep" name="cep" placeholder="00000-000" required pattern="\d{5}-\d{3}" title="Formato: 00000-000" aria-required="true">
+                            </div>
+                            <div class="col-span-12 md:col-span-7">
+                                <label for="endereco" class="block text-sm font-medium text-neutral-700 mb-1">Endereço (Rua, Av., etc) <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="text" id="endereco" name="endereco" placeholder="Ex: Rua das Flores, 100" required aria-required="true">
+                            </div>
+                            <div class="col-span-12 md:col-span-5">
+                                <label for="cidade" class="block text-sm font-medium text-neutral-700 mb-1">Cidade <span class="text-error" aria-hidden="true">*</span></label>
+                                <input type="text" id="cidade" name="cidade" required aria-required="true">
+                            </div>
+                            <div class="col-span-12 md:col-span-7">
+                                <label for="estado" class="block text-sm font-medium text-neutral-700 mb-1">Estado <span class="text-error" aria-hidden="true">*</span></label>
+                                <select id="estado" name="estado" required aria-required="true">
+                                    <option value="" disabled selected>Selecione um Estado</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Agrupamento Lógico 3: Interesse -->
+                    <fieldset class="border border-gray-300 p-6 rounded-lg space-y-4">
+                        <legend class="text-h3 text-primary-600 px-2">Área de Interesse</legend>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2 text-neutral-700">
+                                <input type="checkbox" name="interesse" value="voluntario" class="rounded text-primary-600 border-gray-300 focus:ring-primary-600">
+                                <span>Quero ser Voluntário Ativo (Receber e-mails sobre vagas)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-neutral-700">
+                                <input type="checkbox" name="interesse" value="doador" class="rounded text-primary-600 border-gray-300 focus:ring-primary-600">
+                                <span>Quero ser Doador Mensal (Receber informações sobre impacto)</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-neutral-700">
+                                <input type="checkbox" name="interesse" value="newsletter" class="rounded text-primary-600 border-gray-300 focus:ring-primary-600">
+                                <span>Apenas Newsletter (Receber notícias gerais da ONF)</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <button type="submit" class="btn-primary w-full mt-6 flex items-center justify-center">
+                        <i data-lucide="send" class="w-5 h-5 mr-2" aria-hidden="true"></i> Enviar Cadastro
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Componente de Feedback: Toast/Alerta (Invisível por padrão) -->
+        <div id="toast-message" class="toast" role="status" aria-live="polite">
+            <span id="toast-icon"></span>
+            <span id="toast-text"></span>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-neutral-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm">&copy; 2025 Esperança Viva ONF. Todos os direitos reservados.</p>
+            <div class="flex justify-center space-x-4 mt-3 text-neutral-400">
+                <a href="#" class="hover:text-primary-600 transition" aria-label="Instagram"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                <a href="#" class="hover:text-primary-600 transition" aria-label="Facebook"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                <a href="#" class="hover:text-primary-600 transition" aria-label="Twitter"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript para Interatividade, SPA e Validação Avançada -->
+    <script>
+        // ====================================================================
+        // MÓDULO 1: ROTEAMENTO (SPA BÁSICO E FOCO ACESSÍVEL)
+        // ====================================================================
+
+        /**
+         * Alterna a visibilidade das seções para simular um Single Page Application.
+         * @param {string} pageId - O ID da seção a ser exibida.
+         */
+        const renderPage = (pageId) => {
+            const mainContent = document.getElementById('main-content');
+            document.querySelectorAll('.page-section').forEach(section => {
+                if (section.id === pageId) {
+                    section.classList.remove('hidden');
+                    // Mover o foco para a nova seção (WCAG 2.1 AA)
+                    mainContent.focus(); 
+                    window.scrollTo(0, 0); 
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+        };
+
+        const handleNavigation = (event) => {
+            event.preventDefault();
+            const link = event.currentTarget;
+            let pageId = link.getAttribute('data-page');
+
+            if (!pageId && link.getAttribute('href').startsWith('#')) {
+                pageId = link.getAttribute('href').substring(1);
+            }
+
+            if (pageId) {
+                renderPage(pageId);
+                // Fecha o menu mobile e atualiza ARIA
+                const mobileMenu = document.getElementById('mobile-menu');
+                const menuButton = document.getElementById('menu-button');
+                if (!mobileMenu.classList.contains('hidden')) {
+                     mobileMenu.classList.add('hidden');
+                     menuButton.setAttribute('aria-expanded', 'false');
+                     document.getElementById('menu-icon').setAttribute('data-lucide', 'menu');
+                     lucide.createIcons();
+                }
+            }
+        };
+
+
+        // ====================================================================
+        // MÓDULO 2: TEMPLATES E DADOS
+        // ====================================================================
+
+        const projectData = [
+            { id: 1, title: "Escola do Futuro", description: "Oferece aulas de reforço e cursos profissionalizantes para jovens em áreas de risco social, focando em tecnologia e sustentabilidade.", tag: "Educação", color: "secondary-600", icon: "book-open-text", imageUrl: "https://placehold.co/600x300/3B82F6/ffffff?text=Projeto+Educação" },
+            { id: 2, title: "Clínica Móvel", description: "Ações de saúde preventiva, consultas médicas e odontológicas gratuitas em comunidades rurais e periféricas sem acesso a serviços básicos.", tag: "Saúde", color: "primary-600", icon: "heart-pulse", imageUrl: "https://placehold.co/600x300/10B981/ffffff?text=Projeto+Saúde" },
+            { id: 3, title: "Hortas Comunitárias", description: "Promove a segurança alimentar e a educação ambiental, instalando e mantendo hortas orgânicas em espaços urbanos subutilizados.", tag: "Sustentabilidade", color: "yellow-500", icon: "leaf", imageUrl: "https://placehold.co/600x300/F59E0B/ffffff?text=Projeto+Meio+Ambiente" }
+        ];
+
+        const projectCardTemplate = (project) => `
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition duration-300 hover:shadow-xl hover:scale-[1.01]">
+                <img src="${project.imageUrl}" alt="Imagem ilustrativa do projeto: ${project.title}" class="h-48 w-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x300/F3F4F6/6B7280?text=Sem+Imagem'">
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="bg-${project.color} text-white text-xs font-semibold px-3 py-1 rounded-full tag">${project.tag}</span>
+                        <i data-lucide="${project.icon}" class="w-5 h-5 text-${project.color}" aria-hidden="true"></i>
+                    </div>
+                    <h3 class="text-h3 mb-2">${project.title}</h3>
+                    <p class="text-body-base text-neutral-700 flex-grow">${project.description}</p>
+                    <a href="#" class="text-primary-600 font-semibold mt-4 flex items-center group">
+                        Ver Detalhes
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+        `;
+
+        const populateProjects = () => {
+            const container = document.getElementById('projects-container');
+            if (container) {
+                container.innerHTML = projectData.map(projectCardTemplate).join('');
+            }
+        };
+
+
+        // ====================================================================
+        // MÓDULO 3: VALIDAÇÃO DE FORMULÁRIOS E MÁSCARAS
+        // ====================================================================
+
+        function isValidCPF(cpf) {
+            cpf = cpf.replace(/[^\d]/g, '');
+            if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            let sum = 0, remainder;
+            for (let i = 1; i <= 9; i++) sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+            sum = 0;
+            for (let i = 1; i <= 10; i++) sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            if (remainder !== parseInt(cpf.substring(10, 11))) return false;
+            return true;
+        }
+
+        const setupFormValidation = () => {
+            const form = document.getElementById('cadastroForm');
+            const cpfInput = document.getElementById('cpf');
+            const cpfErrorMessage = document.getElementById('cpf-error-message');
+
+            cpfInput.addEventListener('input', () => {
+                const isComplete = cpfInput.value.length === 14;
+                if (isComplete) {
+                    if (isValidCPF(cpfInput.value)) {
+                        cpfErrorMessage.classList.add('hidden');
+                        cpfInput.classList.remove('border-error');
+                        cpfInput.classList.add('border-success');
+                        cpfInput.setCustomValidity('');
+                        cpfInput.setAttribute('aria-invalid', 'false');
+                    } else {
+                        cpfErrorMessage.classList.remove('hidden');
+                        cpfInput.classList.remove('border-success');
+                        cpfInput.classList.add('border-error');
+                        cpfInput.setCustomValidity('CPF Inválido');
+                        cpfInput.setAttribute('aria-invalid', 'true');
+                    }
+                } else {
+                    cpfErrorMessage.classList.add('hidden');
+                    cpfInput.setCustomValidity('');
+                    cpfInput.classList.remove('border-success', 'border-error');
+                    cpfInput.setAttribute('aria-invalid', 'false');
+                }
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                if (!form.checkValidity()) {
+                    showToast("Por favor, preencha todos os campos obrigatórios e respeite o formato.", 'warning');
+                    return;
+                }
+
+                if (!isValidCPF(cpfInput.value)) {
+                    showToast("Erro de Consistência: O número de CPF digitado não é válido.", 'error');
+                    cpfInput.focus();
+                    cpfErrorMessage.classList.remove('hidden');
+                    cpfInput.classList.add('border-error');
+                    cpfInput.setAttribute('aria-invalid', 'true');
+                    return;
+                }
+
+                showToast("Cadastro enviado com sucesso! Agradecemos o seu interesse e entraremos em contato.", 'success');
+                form.reset();
+                form.querySelectorAll('input:valid, input:invalid').forEach(input => {
+                    input.classList.remove('border-success', 'border-error');
+                    input.setAttribute('aria-invalid', 'false');
+                });
+                cpfErrorMessage.classList.add('hidden');
+            });
+
+            form.addEventListener('input', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                    if (e.target.id !== 'cpf') { 
+                        const isValid = e.target.checkValidity();
+                        e.target.setAttribute('aria-invalid', !isValid);
+                        if (isValid) {
+                            e.target.classList.add('border-success');
+                            e.target.classList.remove('border-error');
+                        } else if (e.target.value.length > 0) {
+                            e.target.classList.add('border-error');
+                            e.target.classList.remove('border-success');
+                        } else {
+                            e.target.classList.remove('border-success', 'border-error');
+                        }
+                    }
+                }
+            });
+
+            // Máscaras (Mantidas)
+            const telInput = document.getElementById('telefone');
+            const cepInput = document.getElementById('cep');
+            const applyMask = (input, mask) => {
+                input.addEventListener('input', (event) => {
+                    let value = event.target.value.replace(/\D/g, '');
+                    let maskedValue = '';
+                    let k = 0;
+                    for (let i = 0; i < mask.length; i++) {
+                        if (k >= value.length) break;
+                        if (mask[i] === '0') { maskedValue += value[k]; k++; } else { maskedValue += mask[i]; }
+                    }
+                    event.target.value = maskedValue;
+                });
+            };
+            applyMask(cpfInput, '000.000.000-00');
+            applyMask(cepInput, '00000-000');
+            telInput.addEventListener('input', (event) => {
+                let value = event.target.value.replace(/\D/g, '');
+                let mask = (value.length > 10) ? '(00) 00000-0000' : '(00) 0000-0000';
+                let maskedValue = '';
+                let k = 0;
+                for (let i = 0; i < mask.length; i++) {
+                    if (k >= value.length) break;
+                    if (mask[i] === '0') { maskedValue += value[k]; k++; } else { maskedValue += mask[i]; }
+                }
+                event.target.value = maskedValue;
+            });
+        };
+
+        // ====================================================================
+        // MÓDULO 4: FEEDBACK E UTILITÁRIOS (Toast e Temas de Acessibilidade)
+        // ====================================================================
+
+        const toastElement = document.getElementById('toast-message');
+        const toastText = document.getElementById('toast-text');
+        const toastIcon = document.getElementById('toast-icon');
+
+        /**
+         * Exibe uma mensagem de feedback na tela (Toast).
+         */
+        const showToast = (message, type) => {
+            let bgColor = 'bg-neutral-900';
+            let iconName = 'info';
+            if (type === 'success') { bgColor = 'bg-success'; iconName = 'check-circle'; } 
+            else if (type === 'error') { bgColor = 'bg-error'; iconName = 'alert-triangle'; } 
+            else if (type === 'warning') { bgColor = 'bg-yellow-600'; iconName = 'alert-circle'; }
+
+            toastElement.className = 'toast';
+            toastElement.classList.add(bgColor);
+            toastText.textContent = message;
+            toastIcon.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5 mr-2 inline-block" aria-hidden="true"></i>`;
+            lucide.createIcons();
+
+            setTimeout(() => toastElement.classList.add('show'), 10);
+            setTimeout(() => { toastElement.classList.remove('show'); }, 4000);
+        };
+        
+        /**
+         * Alterna o tema de acessibilidade (Modo Escuro / Alto Contraste).
+         * @param {'default'|'dark'|'high-contrast'} theme - O tema a ser aplicado.
+         */
+        const toggleTheme = (theme) => {
+            const body = document.body;
+            body.classList.remove('theme-dark', 'theme-high-contrast');
+            
+            if (theme === 'dark') {
+                body.classList.add('theme-dark');
+            } else if (theme === 'high-contrast') {
+                body.classList.add('theme-high-contrast');
+            }
+        };
+
+        // ====================================================================
+        // MÓDULO 5: INICIALIZAÇÃO
+        // ====================================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            populateProjects();
+            setupFormValidation();
+
+            // Configura o SPA e Navegação
+            document.querySelectorAll('.spa-link').forEach(link => {
+                link.addEventListener('click', handleNavigation);
+            });
+
+            // Configura o Menu Hambúrguer (Mobile) e ARIA
+            const menuButton = document.getElementById('menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            menuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenu.classList.toggle('hidden');
+                menuButton.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                document.getElementById('menu-icon').setAttribute('data-lucide', isExpanded ? 'x' : 'menu');
+                lucide.createIcons();
+            });
+            
+            // Configura o Dropdown Desktop para controle de ARIA
+            const dropdownButton = document.getElementById('dropdown-button');
+            const submenuCausa = document.getElementById('submenu-causa');
+
+            if (dropdownButton && submenuCausa) {
+                dropdownButton.addEventListener('click', () => {
+                    const isExpanded = dropdownButton.getAttribute('aria-expanded') === 'true';
+                    dropdownButton.setAttribute('aria-expanded', !isExpanded);
+                    if (isExpanded) {
+                        submenuCausa.classList.add('hidden');
+                    } else {
+                        submenuCausa.classList.remove('hidden');
+                    }
+                });
+                
+                // Fecha o dropdown ao perder o foco
+                submenuCausa.addEventListener('mouseleave', () => {
+                    dropdownButton.setAttribute('aria-expanded', 'false');
+                    submenuCausa.classList.add('hidden');
+                });
+            }
+
+            // Configura a navegação inicial
+            const initialPage = window.location.hash.substring(1) || 'home';
+            renderPage(initialPage);
+            
+            // Adiciona tabindex=-1 ao main para permitir que o JS defina o foco na mudança de página
+            document.getElementById('main-content').setAttribute('tabindex', '-1');
+        });
+    </script>
+</body>
+</html>
